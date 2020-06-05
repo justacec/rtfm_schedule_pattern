@@ -3,27 +3,32 @@
 
 extern crate cortex_m_rt as rt;
 extern crate panic_itm;
-extern crate byte;
 
 use cortex_m::asm;
-use cortex_m::iprintln;
-use core::ops::{Deref, DerefMut};
-
 use rtfm::app;
 use rtfm::cyccnt::{U32Ext};
-use cortex_m::peripheral::{ITM};
-use num_derive::FromPrimitive;
-use core::ptr;
+use stm32f4xx_hal::{prelude::*, stm32};
+
+#[derive(PartialEq)]
+enum State {
+    Stop,
+    SomethingElse
+}
+
+pub struct my_object {
+    state: State 
+}
 
 #[app(device = stm32f4xx_hal::stm32, peripherals = true, monotonic = rtfm::cyccnt::CYCCNT)]
 const APP: () = {
     struct Resources {
+        object: my_object,
         #[init(false)]
-        motor_a_update_state: bool,
+        object_update_state: bool,
         #[init(false)]
-        motor_a_schedule: bool,
+        object_schedule: bool,
         #[init(0)]
-        motor_a_run_count: u32,
+        object_run_count: u32,
     }
 
     #[init()]
@@ -49,6 +54,10 @@ const APP: () = {
         // Initialize (enable) the monotonic timer (CYCCNT)
         _core.DCB.enable_trace();
         _core.DWT.enable_cycle_counter();
+
+        init::LateResources {
+            object: my_object{ state: State::Stop }
+        }
     }
 
     #[idle()]
@@ -58,55 +67,54 @@ const APP: () = {
         }
     }
 
-
     // This functions will be responsible for directly controlling the motor.
     // It will look at the current status and the target status and then configure the
     // motor accordingly
-    #[task(schedule = [motor_a_update_scheduler], spawn = [motor_a_update], resources = [motor_a_update_state, motor_a_schedule])]
-    fn motor_a_update_scheduler(cx: motor_a_update_scheduler::Context) {
+    #[task(schedule = [object_update_scheduler], spawn = [object_update], resources = [object, object_update_state, object_schedule])]
+    fn object_update_scheduler(cx: object_update_scheduler::Context) {
         let frequency: f32 = 60.0;
 
-        *cx.resources.motor_a_schedule = true;
+        *cx.resources.object_schedule = true;
 
-       cx.spawn.motor_a_update().unwrap();
+       cx.spawn.object_update().unwrap();
 
-       if cx.resources.motor_a.state != MotorState::Stop {
+       if cx.resources.object.state != State::Stop {
             let PERIOD = ((100_000_000 as f32) / frequency) as u32;
-            cx.schedule.motor_a_update_scheduler(cx.scheduled + PERIOD.cycles()).unwrap();
+            cx.schedule.object_update_scheduler(cx.scheduled + PERIOD.cycles()).unwrap();
         } else {
-            *cx.resources.motor_a_schedule = false;
+            *cx.resources.object_schedule = false;
         }
     }
 
-    #[task(schedule = [motor_a_update], spawn = [motor_a_update_scheduler, motor_a_worker], capacity=10, resources = [motor_a_run_count, motor_a_schedule, itm])]
-    fn motor_a_update(cx: motor_a_update::Context) {
-        *cx.resources.motor_a_run_count = *cx.resources.motor_a_run_count + 1;
+    #[task(schedule = [object_update], spawn = [object_update_scheduler, object_worker], capacity=10, resources = [object_update_state, object_run_count, object_schedule])]
+    fn object_update(cx: object_update::Context) {
+        *cx.resources.object_run_count = *cx.resources.object_run_count + 1;
 
         // If the scheduler is running, just run once
-        if *cx.resources.motor_a_schedule == false {
-            cx.spawn.motor_a_update_scheduler().unwrap();
+        if *cx.resources.object_schedule == false {
+            cx.spawn.object_update_scheduler().unwrap();
         } else {
-            if cx.resources.motor_a_update_state == false {
-                cx.spawn.motor_a_worker().unwrap();
+            if *cx.resources.object_update_state == false {
+                cx.spawn.object_worker().unwrap();
             }    
         }
     }
 
-    #[task(schedule = [motor_a_update], capacity=10, resources = [motor_a, motor_a_update_state, motor_a_run_count, itm])]
-    fn motor_a_worker(cx: motor_a_worker::Context) {
-        if *cx.resources.motor_a_update_state == true {
+    #[task(schedule = [object_update], capacity=10, resources = [object_update_state, object_run_count])]
+    fn object_worker(cx: object_worker::Context) {
+        if *cx.resources.object_update_state == true {
             return
         }
 
-        *cx.resources.motor_a_update_state = true;
+        *cx.resources.object_update_state = true;
 
-        while(*cx.resources.motor_a_run_count > 0) {
+        while *cx.resources.object_run_count > 0 {
             for i in 0..1000 {
                 asm::nop();
             }
         }
 
-        *cx.resources.motor_a_update_state = false;
+        *cx.resources.object_update_state = false;
     }
 
     extern "C" {

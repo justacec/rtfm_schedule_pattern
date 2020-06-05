@@ -12,20 +12,14 @@ cortex-m-rt = "0.6"
 cortex-m-semihosting = "0.3"
 cortex-m-rtfm = "0.5"
 rtfm-core = "0.3"
-embedded-hal = {version = "0.2.3", features = ['unproven']}
 panic-itm = "0.4"
-byte = "0.2"
 asm-delay = "0.7"
-libm = "0.2"
-stm32f4xx-hal = {version = "0.8", features = ["stm32f411", "rt"]}
-stm32f4 = "0.11"
-heapless = "0.5"
-bbqueue = "0.4"
 num-derive = {version = "0.3", default-features = false }
 num-traits = {version = "0.2", default-features = false }
 num = {version = "0.2", default-features = false }
 nb = {version = "0.1", features = ["unstable"]}
 void = {version = "1.0", default-features = false }
+stm32f4xx-hal = {version = "0.8", features = ["stm32f411", "rt"]}
 
 # this lets you use `cargo fix`!
 [[bin]]
