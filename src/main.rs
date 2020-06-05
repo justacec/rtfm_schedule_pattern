@@ -86,7 +86,7 @@ const APP: () = {
         }
     }
 
-    #[task(schedule = [object_update], spawn = [object_update_scheduler, object_worker], capacity=10, resources = [object_update_state, object_run_count, object_schedule])]
+    #[task(spawn = [object_update_scheduler, object_worker], capacity=10, resources = [object_update_state, object_run_count, object_schedule])]
     fn object_update(cx: object_update::Context) {
         *cx.resources.object_run_count = *cx.resources.object_run_count + 1;
 
@@ -100,7 +100,7 @@ const APP: () = {
         }
     }
 
-    #[task(schedule = [object_update], capacity=10, resources = [object_update_state, object_run_count])]
+    #[task(capacity=10, resources = [object_update_state, object_run_count])]
     fn object_worker(cx: object_worker::Context) {
         if *cx.resources.object_update_state == true {
             return
