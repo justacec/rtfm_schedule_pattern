@@ -1,0 +1,64 @@
+[package]
+name = "stm32_motor_driver"
+version = "0.1.0"
+authors = ["Justace Clutter <justacec@gmail.com>"]
+edition = "2018"
+
+[workspace]
+
+[dependencies]
+cortex-m = "0.6"
+cortex-m-rt = "0.6"
+cortex-m-semihosting = "0.3"
+cortex-m-rtfm = "0.5"
+rtfm-core = "0.3"
+embedded-hal = {version = "0.2.3", features = ['unproven']}
+panic-itm = "0.4"
+byte = "0.2"
+asm-delay = "0.7"
+libm = "0.2"
+stm32f4xx-hal = {version = "0.8", features = ["stm32f411", "rt"]}
+stm32f4 = "0.11"
+heapless = "0.5"
+bbqueue = "0.4"
+num-derive = {version = "0.3", default-features = false }
+num-traits = {version = "0.2", default-features = false }
+num = {version = "0.2", default-features = false }
+nb = {version = "0.1", features = ["unstable"]}
+void = {version = "1.0", default-features = false }
+
+# this lets you use `cargo fix`!
+[[bin]]
+name = "stm32_motor_driver"
+test = false
+bench = false
+
+#[profile.release]
+#opt-level = 0
+#codegen-units = 1 # better optimizations
+#debug = true # symbols are nice and they don't increase the size on Flash
+#lto = true # better optimizations
+
+[profile.release]
+panic = "abort"
+lto = false
+codegen-units = 1
+incremental = false
+#debug = false
+#opt-level = "z"
+debug = true
+opt-level = 2
+
+[profile.dev]
+panic = "abort"
+lto = true
+codegen-units = 1
+incremental = false
+debug = true
+opt-level = 0
+
+#[profile.release.overrides.cortex-m-rt] # +
+#opt-level = 0 # +
+
+#[profile.release.overrides.stm32f1xx-hal]
+#opt-level = 0

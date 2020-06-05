@@ -1,0 +1,8 @@
+{
+    "rust.actionOnSave": "clippy",
+    "rust.mode": "rls",
+    "rust.rls": {
+        "useRustfmt": true,
+        "target": "thumbv7m-none-eabi"
+    }
+}

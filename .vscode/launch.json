@@ -1,0 +1,100 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "openocd",
+            "cwd": "/Users/justaceclutter/Desktop/GermanEqualateralMount/Code/stm32_motor_driver",
+            "executable": "./target/thumbv7m-none-eabi/debug/stm32_motor_driver",
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 100000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    { "type": "console", "label": "ITM", "port": 0 }
+                ]
+            },
+            "name": "Release (OpenOCD) [Attach]",
+            "device": "STM32F103C8",
+            "configFiles": [
+                "./openocd.cfg"
+            ],
+            "postStartSessionCommands": [
+//                "monitor tpiu config internal itm.fifo uart off 8000000"
+            ],
+            "svdFile": "${workspaceRoot}/STM32F411.svd"
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "/Users/justaceclutter/Desktop/GermanEqualateralMount/Code/stm32_motor_driver",
+            "executable": "./target/thumbv7m-none-eabi/debug/stm32_motor_driver",
+            "swoConfig": {
+                "enabled": true,
+                "cpuFrequency": 100000000,
+                "swoFrequency": 2000000,
+                "source": "probe",
+                "decoders": [
+                    { "type": "console", "label": "ITM", "port": 0 }
+                ]
+            },"name": "Release (OpenOCD) [Launch]",
+            "device": "STM32F411",
+            "configFiles": [
+                "./openocd.cfg"
+            ],
+            "postStartSessionCommands": [
+//                "monitor tpiu config internal itm.fifo uart off 8000000"
+            ],
+            "svdFile": "${workspaceRoot}/STM32F411.svd"
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "external",
+            "gdbTarget": "192.168.1.199:3333",
+            "armToolchainPath": "C:\\Program Files (x86)\\GNU Tools Arm Embedded\\9 2019-q4-major\\bin",
+            "cwd": "c:\\Users\\jclutter\\Desktop/GEM\\stm32_motor_driver",
+            "executable": ".\\target\\thumbv7m-none-eabi\\release\\stm32_motor_driver",
+            "name": "Release (RPi) [Launch]",
+//            "swoConfig": {
+//                "enabled": true,
+//                "source": "fifo",
+//                "swoPath": "/tmp/ttyVUSB0",
+//                "decoders": [
+//                    { "type": "console", "label": "ITM", "port": 0 },
+////                    { "type": "graph", "graphId": "Encoder", "port": 1},
+//                    { "type": "binary", "label": "Encoder Values", "port": 1}
+//                ]
+//            },
+//            "graphConfig": [
+//                {
+//                    "label": "Encoder",
+//                    "maximum": 100000,
+//                    "minimum": -100000,
+//                    "plots": [
+//                        {
+//                            "label": "Encoder Values",
+//                            "graphId": "Encoder"
+//                        }
+//                    ]
+//                }
+//            ],
+            "svdFile": "${workspaceRoot}/STM32F411.svd"
+
+//            "showDevDebugOutput": true,
+//            "device": "STM32F411"
+//            "configFiles": [
+//                "./openocd.cfg"
+//                "/usr/local/share/openocd/scripts/board/stm32f103c8_blue_pill.cfg"
+//            ],
+//            "postStartSessionCommands": [
+//                "monitor arm semihosting enable"
+//                "monitor tpiu config external uart off 72000000 4000000"
+//            ]
+        }
+    ]
+}
